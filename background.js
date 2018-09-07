@@ -2,8 +2,10 @@ let lecturesJSON = localStorage.getItem("lectures");
 
 let header = document.getElementsByTagName("h1");
 let watching = 0;
+
+let title;
 if (typeof header[0] !== 'undefined') {
-    let title = header[0].innerHTML;
+    title = header[0].innerHTML;
 } else {
     watching = 1;
 }
@@ -12,23 +14,27 @@ if (lecturesJSON == null) {
     lecturesJSON = '{}';
 }
 
-var episodes = document.getElementsByClassName("episode");
+let episodes = document.getElementsByClassName("episode");
 lecturesJSON = JSON.parse(lecturesJSON);
 if (lecturesJSON[title] == null && title !== 'Your lecture recordings' && watching !== 1) {
-    let blankJSON = JSON.parse('{}');
-    lecturesJSON[title] = blankJSON;
-    let toAdd = JSON.parse('{"hasCompleted":false, "timestamp":"", "videolength":""}');
+    lecturesJSON[title] = JSON.parse('{}');
     for (let i = 0; i < episodes.length; i++) {
-        lecturesJSON[title][episodes[i].getElementsByTagName("a")[0].innerHTML] = toAdd;
+        lecturesJSON[title][episodes[i].getElementsByTagName("a")[0].innerHTML] = JSON.parse('{"hasCompleted":false, "timestamp":"", "videolength":""}');
     }
     localStorage.setItem("lectures", JSON.stringify(lecturesJSON));
 }
 
-if (watching === 1) var title = document.getElementsByClassName("open")[0].getElementsByTagName("a")[0].textContent;
+if (watching === 1) title = document.getElementsByClassName("open")[0].getElementsByTagName("a")[0].textContent;
 
 let episode, timestamp, length, percent, totalSeconds;
-for (let i = 0; i < episodes.length; i++) {
+
+for (let i = 0; i < episodes.length / 2; i++) {
     episode = episodes[i].getElementsByTagName("a")[0];
+
+    if (typeof lecturesJSON[title][episode.innerHTML] === "undefined") {
+        lecturesJSON[title][episode.innerHTML] = JSON.parse('{"hasCompleted":false, "timestamp":"", "videolength":""}');
+        localStorage.setItem("lectures", JSON.stringify(lecturesJSON));
+    }
     if (lecturesJSON[title][episode.innerHTML].hasCompleted === false) {
         timestamp = lecturesJSON[title][episode.innerHTML].timestamp;
         length = lecturesJSON[title][episode.innerHTML].videolength;
@@ -42,7 +48,6 @@ for (let i = 0; i < episodes.length; i++) {
             } else {
                 episode.innerHTML += " - " + percent.toFixed(2) + "% watched";
             }
-
         } else {
             episode.innerHTML += " - ✘";
         }
@@ -53,6 +58,7 @@ for (let i = 0; i < episodes.length; i++) {
 }
 
 let boxes = document.getElementsByClassName("title outspecify");
+let hours, hours2, seconds, seconds2, minutes, minutes2;
 for (let i = 0; i < boxes.length; i++) {
     timestamp = lecturesJSON[title][boxes[i].textContent].timestamp;
     length = lecturesJSON[title][boxes[i].textContent].videolength;
