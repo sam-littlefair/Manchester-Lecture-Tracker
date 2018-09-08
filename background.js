@@ -4,22 +4,22 @@ let header = document.getElementsByTagName("h1");
 let watching = 0;
 
 let title;
-if (typeof header[0] !== 'undefined') {
+if (typeof header[0] !== "undefined") {
     title = header[0].innerHTML;
 } else {
     watching = 1;
 }
 
 if (lecturesJSON == null) {
-    lecturesJSON = '{}';
+    lecturesJSON = "{}";
 }
 
 let episodes = document.getElementsByClassName("episode");
 lecturesJSON = JSON.parse(lecturesJSON);
-if (lecturesJSON[title] == null && title !== 'Your lecture recordings' && watching !== 1) {
-    lecturesJSON[title] = JSON.parse('{}');
+if (lecturesJSON[title] == null && title !== "Your lecture recordings" && watching !== 1) {
+    lecturesJSON[title] = JSON.parse("{}");
     for (let i = 0; i < episodes.length; i++) {
-        lecturesJSON[title][episodes[i].getElementsByTagName("a")[0].innerHTML] = JSON.parse('{"hasCompleted":false, "timestamp":"", "videolength":""}');
+        lecturesJSON[title][episodes[i].getElementsByTagName("a")[0].innerHTML] = JSON.parse("{\"hasCompleted\":false, \"timestamp\":\"\", \"videolength\":\"\"}");
     }
     localStorage.setItem("lectures", JSON.stringify(lecturesJSON));
 }
@@ -32,36 +32,59 @@ for (let i = 0; i < episodes.length / 2; i++) {
     episode = episodes[i].getElementsByTagName("a")[0];
 
     if (typeof lecturesJSON[title][episode.innerHTML] === "undefined") {
-        lecturesJSON[title][episode.innerHTML] = JSON.parse('{"hasCompleted":false, "timestamp":"", "videolength":""}');
+        lecturesJSON[title][episode.innerHTML] = JSON.parse("{\"hasCompleted\":false, \"timestamp\":\"\", \"videolength\":\"\"}");
         localStorage.setItem("lectures", JSON.stringify(lecturesJSON));
     }
+
+    let tick = document.createElement('div');
+    tick.innerHTML = "&nbsp;- ✔";
+    tick.style.display = "inline-block";
+
+    let cross = document.createElement('div');
+    cross.innerHTML = "&nbsp;- ✘";
+    cross.style.display = "inline-block";
+
     if (lecturesJSON[title][episode.innerHTML].hasCompleted === false) {
         timestamp = lecturesJSON[title][episode.innerHTML].timestamp;
         length = lecturesJSON[title][episode.innerHTML].videolength;
 
+        percent = (timestamp / length) * 100;
+
+        let watched = document.createElement('div');
+        watched.innerHTML = "&nbsp;- " + percent.toFixed(2) + "% watched";
+        watched.style.display = "inline-block";
+
         if (timestamp) {
-            percent = (timestamp / length) * 100;
 
             if (percent > 95) {
-                episode.innerHTML += " - ✔";
+                episode.appendChild(tick);
                 episode.style.color = "green";
             } else {
-                episode.innerHTML += " - " + percent.toFixed(2) + "% watched";
+                episode.appendChild(watched);
             }
         } else {
-            episode.innerHTML += " - ✘";
+            episode.appendChild(cross);
         }
     } else {
-        episode.innerHTML += " - ✔";
+        episode.appendChild(tick);
         episode.style.color = "green";
     }
 }
 
 let boxes = document.getElementsByClassName("title outspecify");
-let hours, hours2, seconds, seconds2, minutes, minutes2;
+let hours, hours2, seconds, seconds2, minutes, minutes2, hasCompleted;
 for (let i = 0; i < boxes.length; i++) {
     timestamp = lecturesJSON[title][boxes[i].textContent].timestamp;
     length = lecturesJSON[title][boxes[i].textContent].videolength;
+    hasCompleted = lecturesJSON[title][boxes[i].textContent].hasCompleted;
+
+    let completed = document.createElement('div');
+    completed.innerHTML = "<div> You have completed this lecture ✔ </div>";
+    completed.style.display = "inline-block";
+
+    let incompleted = document.createElement('div');
+    incompleted.innerHTML = "<div> You haven't watched this lecture yet. </div>";
+    incompleted.style.display = "inline-block";
 
     if (timestamp) {
         percent = (timestamp / length) * 100;
@@ -77,14 +100,17 @@ for (let i = 0; i < boxes.length; i++) {
         minutes = Math.floor(totalSeconds / 60);
         seconds = totalSeconds % 60;
 
-        if (percent > 95) {
-            boxes[i].innerHTML = "You have completed this lecture ✔";
-            boxes[i].style.color = 'green';
+        let watchtime = document.createElement('div');
+        watchtime.innerHTML = "<div> Watched - " + hours + ":" + minutes.toFixed(0) + ":" + seconds.toFixed(0) + "/" + hours2 + ":" + minutes2.toFixed(0) + ":" + seconds2.toFixed(0) + "</div>";
+
+        if (hasCompleted) {
+            boxes[i].appendChild(completed);
+            boxes[i].style.color = "green";
         } else {
-            boxes[i].innerHTML = 'Watched - ' + hours + ':' + minutes.toFixed(0) + ':' + seconds.toFixed(0) + ' / ' + hours2 + ':' + minutes2.toFixed(0) + ':' + seconds2.toFixed(0);
+            boxes[i].appendChild(watchtime);
         }
     } else {
-        boxes[i].innerHTML = "You haven't watched this lecture yet."
+        boxes[i].appendChild(incompleted);
     }
 }
 if (watching === 1) {
