@@ -36,12 +36,12 @@ for (let i = 0; i < episodes.length / 2; i++) {
         localStorage.setItem("lectures", JSON.stringify(lecturesJSON));
     }
 
-    let tick = document.createElement('div');
-    tick.innerHTML = "&nbsp;- ✔";
+    let tick = document.createElement("div");
+    tick.textContent = " - ✔ ";
     tick.style.display = "inline-block";
 
-    let cross = document.createElement('div');
-    cross.innerHTML = "&nbsp;- ✘";
+    let cross = document.createElement("div");
+    cross.textContent = " - ✘ ";
     cross.style.display = "inline-block";
 
     if (lecturesJSON[title][episode.innerHTML].hasCompleted === false) {
@@ -50,8 +50,8 @@ for (let i = 0; i < episodes.length / 2; i++) {
 
         percent = (timestamp / length) * 100;
 
-        let watched = document.createElement('div');
-        watched.innerHTML = "&nbsp;- " + percent.toFixed(2) + "% watched";
+        let watched = document.createElement("div");
+        watched.textContent = " - " + percent.toFixed(2) + "% watched";
         watched.style.display = "inline-block";
 
         if (timestamp) {
@@ -78,12 +78,12 @@ for (let i = 0; i < boxes.length; i++) {
     length = lecturesJSON[title][boxes[i].textContent].videolength;
     hasCompleted = lecturesJSON[title][boxes[i].textContent].hasCompleted;
 
-    let completed = document.createElement('div');
-    completed.innerHTML = "<div> You have completed this lecture ✔ </div>";
+    let completed = document.createElement("div");
+    completed.textContent = "You have completed this lecture ✔";
     completed.style.display = "inline-block";
 
-    let incompleted = document.createElement('div');
-    incompleted.innerHTML = "<div> You haven't watched this lecture yet. </div>";
+    let incompleted = document.createElement("div");
+    incompleted.textContent = "You haven't watched this lecture yet.";
     incompleted.style.display = "inline-block";
 
     if (timestamp) {
@@ -100,8 +100,8 @@ for (let i = 0; i < boxes.length; i++) {
         minutes = Math.floor(totalSeconds / 60);
         seconds = totalSeconds % 60;
 
-        let watchtime = document.createElement('div');
-        watchtime.innerHTML = "<div> Watched - " + hours + ":" + minutes.toFixed(0) + ":" + seconds.toFixed(0) + "/" + hours2 + ":" + minutes2.toFixed(0) + ":" + seconds2.toFixed(0) + "</div>";
+        let watchtime = document.createElement("div");
+        watchtime.textContent = "Watched - " + hours + ":" + minutes.toFixed(0) + ":" + seconds.toFixed(0) + "/" + hours2 + ":" + minutes2.toFixed(0) + ":" + seconds2.toFixed(0);
 
         if (hasCompleted) {
             boxes[i].appendChild(completed);
