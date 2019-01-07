@@ -30,7 +30,9 @@ let episode, timestamp, length, percent, totalSeconds;
 
 for (let i = 0; i < episodes.length / 2; i++) {
     episode = episodes[i].getElementsByTagName("a")[0];
-
+    title = title.replace(" & ", " &amp; ");
+    title = title.replace(" + ", " &plus; ");
+    title = title.replace(" = ", " &equals; ");
     if (typeof lecturesJSON[title][episode.innerHTML] === "undefined") {
         lecturesJSON[title][episode.innerHTML] = JSON.parse("{\"hasCompleted\":false, \"timestamp\":\"\", \"videolength\":\"\"}");
         localStorage.setItem("lectures", JSON.stringify(lecturesJSON));
