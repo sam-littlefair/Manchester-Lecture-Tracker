@@ -1,5 +1,5 @@
 let lecturesJSON = localStorage.getItem("lectures");
-
+let speed_settings = ["0.5x", "0.75x", "1x", "1.25x", "1.5x", "1.75x", "2x", "2.25x", "2.5x", "2.75x", "3x"];
 let header = document.getElementsByTagName("h1");
 let watching = 0;
 
@@ -120,28 +120,33 @@ for (let i = 0; i < boxes.length; i++) {
 if (watching === 1) {
     let video = document.getElementById("video_html5_api");
     episode = document.getElementsByClassName("active")[1].textContent;
+    document.getElementsByClassName('vjs-playback-rate vjs-menu-button vjs-control')[0].setAttribute("onclick", "handleClick(this)");
 
     let interval = setInterval(function () {
         if (video.readyState > 0) {
-            let playbackbox = document.getElementsByClassName("vjs-playback-rate-value")[0];
+            let speedsettings = document.getElementsByClassName("vjs-menu-content")[0];
+            let speeds = speedsettings.getElementsByClassName('vjs-menu-item');
+
+            for(var i = 0; i < speeds.length; i++){
+                speeds[i].style.display = 'none';
+            }
+
+            speedsettings.insertAdjacentHTML("afterbegin", '<li class="vjs-menu-item-new" onclick="selectSpeed(this)" role="button" aria-live="polite" tabindex="0" aria-selected="false">0.5x</li>');
+            speedsettings.insertAdjacentHTML("afterbegin", '<li class="vjs-menu-item-new" onclick="selectSpeed(this)" role="button" aria-live="polite" tabindex="0" aria-selected="false">0.75x</li>');
+            speedsettings.insertAdjacentHTML("afterbegin", '<li class="vjs-menu-item-new" onclick="selectSpeed(this)" role="button" aria-live="polite" tabindex="0" aria-selected="false">1x</li>');
+            speedsettings.insertAdjacentHTML("afterbegin", '<li class="vjs-menu-item-new" onclick="selectSpeed(this)" role="button" aria-live="polite" tabindex="0" aria-selected="false">1.25x</li>');
+            speedsettings.insertAdjacentHTML("afterbegin", '<li class="vjs-menu-item-new" onclick="selectSpeed(this)" role="button" aria-live="polite" tabindex="0" aria-selected="false">1.5x</li>');
+            speedsettings.insertAdjacentHTML("afterbegin", '<li class="vjs-menu-item-new" onclick="selectSpeed(this)" role="button" aria-live="polite" tabindex="0" aria-selected="false">1.75x</li>');
+            speedsettings.insertAdjacentHTML("afterbegin", '<li class="vjs-menu-item-new" onclick="selectSpeed(this)" role="button" aria-live="polite" tabindex="0" aria-selected="false">2x</li>');
+            speedsettings.insertAdjacentHTML("afterbegin", '<li class="vjs-menu-item-new" onclick="selectSpeed(this)" role="button" aria-live="polite" tabindex="0" aria-selected="false">2.25x</li>');
+            speedsettings.insertAdjacentHTML("afterbegin", '<li class="vjs-menu-item-new" onclick="selectSpeed(this)" role="button" aria-live="polite" tabindex="0" aria-selected="false">2.5x</li>');
+            speedsettings.insertAdjacentHTML("afterbegin", '<li class="vjs-menu-item-new" onclick="selectSpeed(this)" role="button" aria-live="polite" tabindex="0" aria-selected="false">2.75x</li>');
+            speedsettings.insertAdjacentHTML("afterbegin", '<li class="vjs-menu-item-new" onclick="selectSpeed(this)" role="button" aria-live="polite" tabindex="0" aria-selected="false">3x</li>');
+
             let speed = lecturesJSON[title][episode].playback;
 
             if(typeof lecturesJSON[title][episode].playback !== "undefined") {
-                let i = 0;
-                if (speed === "1.25x") {
-                    i = 1;
-                } else if (speed === "1.5x") {
-                    i = 2;
-                } else if (speed === "2x") {
-                    i = 3;
-                } else if (speed === "0.75x") {
-                    i = 4;
-                }
-
-                while(i > 0){
-                    playbackbox.click();
-                    i--;
-                }
+                video.playbackRate = speed.substring(0, speed.length - 1);
             }
             lecturesJSON[title][episode].videolength = video.duration;
             localStorage.setItem("lectures", JSON.stringify(lecturesJSON));
@@ -159,4 +164,33 @@ if (watching === 1) {
         }
         localStorage.setItem("lectures", JSON.stringify(lecturesJSON));
     };
+}
+
+function handleClick(){
+    let speed_now = document.getElementsByClassName("vjs-playback-rate-value")[0].textContent;
+    let index = 10 - speed_settings.indexOf(speed_now);
+
+    if(speed_now === "2x"){
+        selectSpeed(document.getElementsByClassName("vjs-menu-item-new")[3]);
+    }else if(index > 0){
+        selectSpeed(document.getElementsByClassName("vjs-menu-item-new")[index - 1]);
+    }else{
+        selectSpeed(document.getElementsByClassName("vjs-menu-item-new")[10]);
+    }
+}
+
+function selectSpeed(speed){
+    let parent = document.getElementsByClassName("vjs-menu-content")[0];
+    let selected = parent.getElementsByClassName("vjs-selected")[0];
+
+    if(typeof selected !== "undefined") {
+        selected.setAttribute("aria-selected", false);
+        selected.classList.remove("vjs-selected");
+    }
+
+    speed.setAttribute("aria-selected", true);
+    speed.classList.add("vjs-selected");
+
+    let video = document.getElementById("video_html5_api");
+    video.playbackRate = speed.textContent.substring(0, speed.textContent.length - 1);
 }
