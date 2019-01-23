@@ -19,7 +19,7 @@ lecturesJSON = JSON.parse(lecturesJSON);
 if (lecturesJSON[title] == null && title !== "Your lecture recordings" && watching !== 1) {
     lecturesJSON[title] = JSON.parse("{}");
     for (let i = 0; i < episodes.length; i++) {
-        lecturesJSON[title][episodes[i].getElementsByTagName("a")[0].innerHTML] = JSON.parse("{\"hasCompleted\":false, \"timestamp\":\"\", \"playback\":\"\", \"videolength\":\"\"}");
+        lecturesJSON[title][episodes[i].getElementsByTagName("a")[0].innerHTML] = JSON.parse("{\"hasCompleted\":false, \"timestamp\":\"\", \"playback\":\"1x\", \"videolength\":\"\"}");
     }
     localStorage.setItem("lectures", JSON.stringify(lecturesJSON));
 }
@@ -34,10 +34,10 @@ for (let i = 0; i < episodes.length / 2; i++) {
     title = title.replace(" + ", " &plus; ");
     title = title.replace(" = ", " &equals; ");
     if (typeof lecturesJSON[title][episode.innerHTML] === "undefined") {
-        lecturesJSON[title][episode.innerHTML] = JSON.parse("{\"hasCompleted\":false, \"timestamp\":\"\", \"playback\":\"\", \"videolength\":\"\"}");
+        lecturesJSON[title][episode.innerHTML] = JSON.parse("{\"hasCompleted\":false, \"timestamp\":\"\", \"playback\":\"1x\", \"videolength\":\"\"}");
         localStorage.setItem("lectures", JSON.stringify(lecturesJSON));
     } else if(typeof lecturesJSON[title][episode.innerHTML].playback === "undefined"){
-        lecturesJSON[title][episode.innerHTML].playback = "";
+        lecturesJSON[title][episode.innerHTML].playback = "1x";
     }
 
     let tick = document.createElement("div");
@@ -144,10 +144,12 @@ if (watching === 1) {
             speedsettings.insertAdjacentHTML("afterbegin", '<li class="vjs-menu-item-new" onclick="selectSpeed(this)" role="button" aria-live="polite" tabindex="0" aria-selected="false">3x</li>');
 
             let speed = lecturesJSON[title][episode].playback;
-
-            if(typeof lecturesJSON[title][episode].playback !== "undefined") {
-                video.playbackRate = speed.substring(0, speed.length - 1);
+            if(speed === "0x"){
+                speed = "1x";
+                lecturesJSON[title][episode].playback = "1x";
             }
+            video.playbackRate = speed.substring(0, speed.length - 1);
+
             lecturesJSON[title][episode].videolength = video.duration;
             localStorage.setItem("lectures", JSON.stringify(lecturesJSON));
             if (lecturesJSON[title][episode].timestamp)
@@ -158,7 +160,12 @@ if (watching === 1) {
 
     video.ontimeupdate = function () {
         lecturesJSON[title][episode].timestamp = video.currentTime;
-        lecturesJSON[title][episode].playback = document.getElementsByClassName("vjs-playback-rate-value")[0].textContent;
+        let newspeed = document.getElementsByClassName("vjs-playback-rate-value")[0].textContent;
+
+        if(newspeed === "0x"){
+            newspeed = "1x";
+        }
+        lecturesJSON[title][episode].playback = newspeed;
         if (video.currentTime / lecturesJSON[title][episode].videolength > 0.95) {
             lecturesJSON[title][episode].hasCompleted = true;
         }
